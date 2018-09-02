@@ -10,8 +10,16 @@ class qnote(models.Model):
     created_by = fields.Many2one('res.users', string="Erstellt durch", default=lambda self: self.env.user, readonly="true")
     date_accepted = fields.Datetime('Bestätigt am:', readonly="true")
     accepted_by = fields.Many2one('res.users', string="Bestätigt durch", readonly="true")
+    state = fields.selection([
+        ('draft', 'Quotation'),
+        ('sent', 'Quotation Sent'),
+        ('sale', 'Sales Order'),
+        ('done', 'Locked'),
+        ('cancel', 'Cancelled'),
+        ])
     
     description = fields.Html('Beschreibung')
+    analysis = fields.Html('Problemanalyse')
 
     value = fields.Integer()
     value2 = fields.Float(compute="_value_pc", store=True)
