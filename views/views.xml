@@ -20,9 +20,12 @@
       <field name="arch" type="xml">
         <form string="Q Meldung">
           <header>
-            <field name="state" widget="statusbar" statusbar_visible="draft,created,confirmed,done,cancelled"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,created,confirmed,done,cancel"/>
           </header>
+          <sheet>
+          </sheet>
         </form>
+      </field>
     </record>
 
 

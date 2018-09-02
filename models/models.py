@@ -10,7 +10,7 @@ class qnote(models.Model):
     created_by = fields.Many2one('res.users', string="Erstellt durch", default=lambda self: self.env.user, readonly="true")
     date_accepted = fields.Datetime('Bestätigt am:', readonly="true")
     accepted_by = fields.Many2one('res.users', string="Bestätigt durch", readonly="true")
-    state = fields.selection([
+    state = fields.Selection([
         ('draft', 'Entwurf'),
         ('created', 'Erstellt'),
         ('confirmed', 'Bestätigt'),
