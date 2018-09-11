@@ -23,9 +23,10 @@
     'depends': ['base','stock','portal','product'],
 
     # always loaded
-    'data': [
-        # 'security/ir.model.access.csv',
+    'data': [ 
+        'security/q_note_security.xml',
         'views/views.xml',
+        'security/ir.model.access.csv',
         #'views/templates.xml',
     ],
     # only loaded in demonstration mode

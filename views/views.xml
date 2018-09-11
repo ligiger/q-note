@@ -3,13 +3,14 @@
     <!-- explicit list view definition -->
     
     <record model="ir.ui.view" id="q_note.list">
-      <field name="name">q_note list</field>
+      <field name="name">Liste</field>
       <field name="model">q_note</field>
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
+          <field name="op_type"/>
+          <field name="move_line"/>
+          <field name="state"/>
         </tree>
       </field>
     </record>
@@ -20,33 +21,60 @@
       <field name="arch" type="xml">
         <form string="Q Meldung">
           <header>
-            <field name="state" widget="statusbar" statusbar_visible="draft,created,confirmed,done,cancel"/>
+            <button name="confirm" string="Einreichen" type="object" states="draft" class="btn-primary"/>
+            <button name="accept" string="Bestätigen" type="object" states="created" class="btn-primary" groups="q_note.group_manager"/>
+            <button name="validate" string="Validieren" type="object" states="confirmed" class="btn-primary" groups="q_note.group_validator"/>
+
+            <button name="done" string="Abschliessen" type="object" states="validated" class="btn-primary" groups="q_note.group_manager"/>
+            <button name="edit" string="Auf ENTWURF setzen" type="object" states="created, confirmed" class="btn-primary" groups="q_note.group_manager"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,created,confirmed,validated,done,cancel"/>
           </header>
           <sheet>
               <h1><field name="name"/></h1>
               <group>
-                <field name="op_type"/>
+                <field name="op_type" attrs="{'readonly':[('state','!=','draft')]}"/>
               </group>
               <group>
-                <field name="product_we_id"/>
-                <field name="move_line" domain="[('picking_id','=', product_we_id)]"/>
-                <field name="lieferant"/>
-                <field name="bestellung"/>
-                <field name="ls_nummer"/>
-                <field name="migo_nummer"/>
+                <field name="product_we_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                <field name="move_line" domain="[('picking_id','=', product_we_id)]" attrs="{'readonly':[('state','!=','draft')]}"/>
+                <field name="lieferant" attrs="{'readonly':[('state','!=','draft')]}"/>
+                <field name="bestellung" attrs="{'readonly':[('state','!=','draft')]}"/>
+                <field name="ls_nummer" attrs="{'readonly':[('state','!=','draft')]}"/>
+                <field name="migo_nummer" attrs="{'readonly':[('state','!=','draft')]}"/>
               </group>
               <notebook>
                 <page string="Problembeschreibung">
-                    <field name="description"/>
+                    <field name="description" attrs="{'readonly':[('state','!=','draft')]}"/>
                 </page>
                 <page string="Problemanalyse">
-                    <field name="analysis"/>
+                    <field name="analysis" attrs="{'readonly':[('state','!=','created')]}"/>
+                </page>
+                <page string="Massnahmen">
+                  <div>
+                    <field name="activity_ids"/>
+                  </div>  
                 </page>
                 <page string="Workflow">
+                  <group string="Erstellt">
+                    <field name="date_create"/>
+                    <field name="created_by"/>
+                  </group>
+                  <group string="Angenommen">
                     <field name="date_accepted"/>
+                    <field name="accepted_by"/>
+                  </group>
+                  <group string="Validiert">
+                    <field name="date_validated"/>
+                    <field name="validated_by"/>
+                  </group>
                 </page>
               </notebook>
           </sheet>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="activity_ids" widget="mail_activity"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
         </form>
       </field>
     </record>
@@ -55,43 +83,66 @@
     <!-- actions opening views on models -->
     
     <record model="ir.actions.act_window" id="q_note.action_window">
-      <field name="name">q_note window</field>
+      <field name="name">Abweichungsmeldungen</field>
       <field name="res_model">q_note</field>
       <field name="view_mode">tree,form</field>
     </record>
+
+  <!-- Stock picking -->
+  <record model="ir.ui.view" id="stock_picking_form_qnote_inherited">
+      <field name="name">mi_new_view</field>
+      <field name="model">stock.picking</field>
+      <field name="inherit_id" ref="stock.view_picking_form"/>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[@name='extra']" position="after">
+          <page string="Abweichungen">
+            <field  name="abweichungen" context="{'default_product_we_id': id}"/>
+          </page>
+        </xpath>
+      </field>
+  </record>
+
+  <!-- Inherit Activity Tree
+    <record model="ir.ui.view" id="mail_activity_qnote_inherited_tree">
+      <field name="name">Tree View</field>
+      <field name="model">mail.activity</field>
+      <field name="inherit_id" ref="mail.mail_activity_view_tree"/>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <xpath expr="//tree[1]" position="attributes">
+          <attribute name="create">true</attribute>
+        </xpath>
+      </field>
+  </record>-->
     
 
-    <!-- server action to the one above -->
-    
-    <record model="ir.actions.server" id="q_note.action_server">
-      <field name="name">q_note server</field>
-      <field name="model_id" ref="model_q_note"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    
+
 
     <!-- Top menu item -->
     
-    <menuitem name="q_note" id="q_note.menu_root"/>
+    <menuitem name="Qualitätswesen" id="q_note.menu_root"/>
     
     <!-- menu categories -->
     
-    <menuitem name="Menu 1" id="q_note.menu_1" parent="q_note.menu_root"/>
+    <menuitem name="Abweichungen" id="q_note.menu_1" parent="q_note.menu_root"/>
     <menuitem name="Menu 2" id="q_note.menu_2" parent="q_note.menu_root"/>
     
     <!-- actions -->
     
-    <menuitem name="List" id="q_note.menu_1_list" parent="q_note.menu_1"
+    <menuitem name="Abweichungsmeldungen" id="q_note.menu_1_list" parent="q_note.menu_1"
               action="q_note.action_window"/>
-    <menuitem name="Server to list" id="q_note" parent="q_note.menu_2"
-              action="q_note.action_server"/>
     
+  </data>
+  
+  <data noupdate="1">
+    <record id="seq_qnote_id" model="ir.sequence">
+      <field name="name">qnote_sequence</field>
+      <field name="code">q_note</field>
+      <field name="prefix">ABW-%(y)s%(month)s%(day)s-</field>
+      <field name="padding">2</field>
+      <!--<field name="suffix"></field>-->
+    </record>
+
   </data>
 </odoo>

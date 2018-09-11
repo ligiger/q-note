@@ -12,12 +12,12 @@ class q_note(models.Model):
     _description = 'Qualitätsmeldung'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char()
+    name = fields.Char(default="Neue Abweichungsmeldung", readonly="true")
     
     op_type = fields.Selection([
         ('product', 'Lagerprodukt'),
         ('process', 'Prozess'),
-        ])
+    ], default="product", string="Meldungstyp")
     
     product_we_id = fields.Many2one('stock.picking', string="Wareneingang Vorgang")
     move_line = fields.Many2one('stock.move.line', string="Betroffenes Produkt")
@@ -36,6 +36,9 @@ class q_note(models.Model):
     date_accepted = fields.Datetime(string='Bestätigt am:', readonly="true")
     accepted_by = fields.Many2one('res.users', string="Bestätigt durch", readonly="true")
 
+    date_validated = fields.Datetime(string='Validiert am:', readonly="true")
+    validated_by = fields.Many2one('res.users', string="Validiert durch", readonly="true")
+
     date_done = fields.Datetime(string='Abgeschlossen am:', readonly="true")
     done_by = fields.Many2one('res.users', string="Abgeschlossen durch", readonly="true")
 
@@ -46,11 +49,51 @@ class q_note(models.Model):
         ('draft', 'Entwurf'),
         ('created', 'Eingereicht'),
         ('confirmed', 'Bestätigt'),
+        ('validated', 'Validiert'),
         ('done', 'Abgeschlossen'),
         ('cancel', 'Abgebrochen'),
-        ])
+        ], default="draft")
     
+    @api.model
+    def create(self, vals):
+        seq = self.env['ir.sequence'].get('q_note') or '/'
+        vals['name'] = seq
+        return super(q_note, self).create(vals)
     
+    @api.one
+    def confirm(self):
+        self.write({'state': 'created'})
+        self.write({'date_create': fields.Datetime.now()})
+        self.write({'created_by': self.env['res.users'].browse(self.env.uid).id})
+
+    @api.one
+    def accept(self):
+        self.write({'state': 'confirmed'})
+        self.write({'date_accepted': fields.Datetime.now()})
+        self.write({'accepted_by': self.env['res.users'].browse(self.env.uid).id})
+
+    @api.one
+    def validate(self):
+        self.write({'state': 'validated'})
+        self.write({'date_validated': fields.Datetime.now()})
+        self.write({'validated_by': self.env['res.users'].browse(self.env.uid).id})
+
+    @api.one
+    def done(self):
+        self.write({'state': 'done'})
+        self.write({'date_done': fields.Datetime.now()})
+        self.write({'done_by': self.env['res.users'].browse(self.env.uid).id})
+
+    @api.one
+    def cancel(self):
+        self.write({'state': 'cancel'})
+        self.write({'date_cancelled': fields.Datetime.now()})
+        self.write({'cancelled_by': self.env['res.users'].browse(self.env.uid).id})
+
+    @api.one
+    def edit(self):
+        self.write({'state': 'draft'})
+
     description = fields.Html('Beschreibung')
     analysis = fields.Html('Problemanalyse')
 
@@ -75,17 +118,8 @@ class StockMoveLine(models.Model):
             name = '[%s] %s' % (lot,record.product_id.name)
             result.append((record.id, name))
         return result
-        '''
-        # TDE: this could be cleaned a bit I think
-        name = self.get('name', '')
-        lot = self..get('lot_name', False) or False
-        if lot:
-            name = '[%s] %s' % (lot,name)
-        return (self['id'], name)'''
-        '''
-        def _name_get(d):
-            name = d.get('name', '')
-            code = self._context.get('display_default_code', True) and d.get('default_code', False) or False
-            if code:
-                name = '[%s] %s' % (code,name)
-            return (d['id'], name)'''
+
+class Picking(models.Model):
+    _inherit = 'stock.picking'
+
+    abweichungen = fields.One2many('q_note', 'product_we_id', string="Abweichungsmeldungen")
