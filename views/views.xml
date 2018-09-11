@@ -14,6 +14,17 @@
         </tree>
       </field>
     </record>
+  <!-- Graph definition -->
+  <record model="ir.ui.view" id="q_note.graph1">
+      <field name="name">Grafik</field>
+      <field name="model">q_note</field>
+      <field name="arch" type="xml">
+        <graph string="Meldungen" type="bar">
+          <field name="date_create"/>
+          <field name="name"/>
+        </graph>
+      </field>
+    </record>
     
     <record id="q_note_form" model="ir.ui.view">
       <field name="name">q_note_form</field>
@@ -85,7 +96,8 @@
     <record model="ir.actions.act_window" id="q_note.action_window">
       <field name="name">Abweichungsmeldungen</field>
       <field name="res_model">q_note</field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form,graph</field>
     </record>
 
   <!-- Stock picking -->
