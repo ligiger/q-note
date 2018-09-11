@@ -23,6 +23,29 @@
             <field name="state" widget="statusbar" statusbar_visible="draft,created,confirmed,done,cancel"/>
           </header>
           <sheet>
+              <h1><field name="name"/></h1>
+              <group>
+                <field name="op_type"/>
+              </group>
+              <group>
+                <field name="product_we_id"/>
+                <field name="move_line" domain="[('picking_id','=', product_we_id)]"/>
+                <field name="lieferant"/>
+                <field name="bestellung"/>
+                <field name="ls_nummer"/>
+                <field name="migo_nummer"/>
+              </group>
+              <notebook>
+                <page string="Problembeschreibung">
+                    <field name="description"/>
+                </page>
+                <page string="Problemanalyse">
+                    <field name="analysis"/>
+                </page>
+                <page string="Workflow">
+                    <field name="date_accepted"/>
+                </page>
+              </notebook>
           </sheet>
         </form>
       </field>
