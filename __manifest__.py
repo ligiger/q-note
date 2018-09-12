@@ -28,6 +28,8 @@
         'views/views.xml',
         'security/ir.model.access.csv',
         #'views/templates.xml',
+        'report/q_note_report.xml',
+        'report/q_note_report_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
