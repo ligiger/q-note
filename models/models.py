@@ -7,10 +7,37 @@ from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
 
+class risk(models.Model):
+    _name = 'q_note.risk'
+    _description = 'Risiko'
+
+    auswirkung = fields.Selection([
+        ('1', 'Klein'),
+        ('2', 'Mittel'),
+        ('3', 'Gross'),
+        ], string="Auswirkungen")
+    probability = fields.Selection([
+        ('1', 'Unwahrscheinlich'),
+        ('2', 'Wahrscheinlich'),
+        ('3', 'Sehr Wahrschenlich'),
+        ], string="Wahrschenlichkeit des Auftretens")
+    discovery = fields.Selection([
+        ('3', 'Unwahrscheinlich'),
+        ('2', 'Wahrscheinlich'),
+        ('1', 'Sehr Wahrschenlich'),
+        ], string="Entdeckungswahrscheinlichkeit")
+    
+    risikozahl = fields.Float(compute="_value_pc", store=True)
+
+    @api.depends('discovery','probability','auswirkung')
+    def _value_pc(self):
+        for record in self:
+            record.risikozahl = int(record.auswirkung) * int(record.probability) * int(record.discovery)
+
 class q_note(models.Model):
     _name = 'q_note'
     _description = 'Qualitätsmeldung'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin','q_note.risk']
 
     name = fields.Char(default="Neue Abweichungsmeldung", readonly="true")
     
@@ -25,6 +52,8 @@ class q_note(models.Model):
     bestellung = fields.Char(related='product_we_id.origin', string="Bestellnummer", readonly="true")
     ls_nummer = fields.Char(related='product_we_id.x_ls_nummer', string="Lieferscheinnummer", readonly="true")
     migo_nummer = fields.Char(related='product_we_id.x_migo_nr', string="Migo-Nummer", readonly="true")
+
+    process = fields.Char(string="Betroffener Prozess")
     
 
     date_create = fields.Datetime(string='Erstelldatum', default=fields.Datetime.now, readonly="true")
@@ -116,3 +145,4 @@ class Picking(models.Model):
     _inherit = 'stock.picking'
 
     abweichungen = fields.One2many('q_note', 'product_we_id', string="Abweichungsmeldungen")
+

@@ -45,7 +45,7 @@
               <group>
                 <field name="op_type" attrs="{'readonly':[('state','!=','draft')]}"/>
               </group>
-              <group>
+              <group attrs="{'invisible':[('op_type','!=', 'product')]}">
                 <field name="product_we_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                 <field name="move_line" domain="[('picking_id','=', product_we_id)]" attrs="{'readonly':[('state','!=','draft')]}"/>
                 <field name="lieferant" attrs="{'readonly':[('state','!=','draft')]}"/>
@@ -53,16 +53,28 @@
                 <field name="ls_nummer" attrs="{'readonly':[('state','!=','draft')]}"/>
                 <field name="migo_nummer" attrs="{'readonly':[('state','!=','draft')]}"/>
               </group>
+              <group attrs="{'invisible':[('op_type','!=', 'process')]}">
+                <field name="process" attrs="{'readonly':[('state','!=','draft')]}"/>
+              </group>
               <notebook>
                 <page string="Problembeschreibung">
-                    <field name="description" attrs="{'readonly':[('state','!=','draft')]}"/>
+                    <field name="description" widget="html" attrs="{'readonly':[('state','!=','draft')]}"/>
                 </page>
                 <page string="Problemanalyse">
-                    <field name="analysis" attrs="{'readonly':[('state','!=','created')]}"/>
+                    <field name="analysis" widget="html" attrs="{'readonly':[('state','!=','created')]}"/>
+                </page>
+                <page string="Risikoanalyse">
+                  <group string= "Risikobewertung nach Q.Wiki 'Bewertungsschema Risiken'">
+                    <field name="auswirkung" attrs="{'readonly':[('state','!=','created')]}"/>
+                    <field name="probability" attrs="{'readonly':[('state','!=','created')]}"/>
+                    <field name="discovery" attrs="{'readonly':[('state','!=','created')]}"/>
+                    <field name="risikozahl"/>
+                  </group>
                 </page>
                 <page string="Massnahmen">
                   <div>
-                    <field name="activity_ids"/>
+                    Massnahmen sind unten aufgeführt!!
+                    <field name="activity_ids" widget="mail_activity"/>
                   </div>  
                 </page>
                 <page string="Workflow">
@@ -82,7 +94,7 @@
               </notebook>
           </sheet>
           <div class="oe_chatter">
-            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
             <field name="activity_ids" widget="mail_activity"/>
             <field name="message_ids" widget="mail_thread"/>
           </div>
@@ -115,7 +127,8 @@
       </field>
   </record>
 
-  <!-- Inherit Activity Tree
+  <!-- Inherit Activity Tree-->
+  <!-->
     <record model="ir.ui.view" id="mail_activity_qnote_inherited_tree">
       <field name="name">Tree View</field>
       <field name="model">mail.activity</field>
@@ -126,10 +139,22 @@
           <attribute name="create">true</attribute>
         </xpath>
       </field>
-  </record>-->
-    
+  </record>
 
-
+  <record model="ir.ui.view" id="mail_activity_qnote_inherited_popup">
+      <field name="name">Form View</field>
+      <field name="model">mail.activity</field>
+      <field name="inherit_id" ref="mail.mail_activity_view_form_popup"/>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name = 'note']" position="after">
+            <field name="res_model"/>
+            <field name="res_model_id"/>
+            <field name="res_id"/>
+        </xpath>
+      </field>
+  </record>   
+-->
 
     <!-- Top menu item -->
     

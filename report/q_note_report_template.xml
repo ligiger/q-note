@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-
-    <template id="q_note_report_template">
+    <template id="q_note.q_note_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="q_note.q_note_report_template"/>
+                </t>
+            </t>
+    </template>
+<!--
+<template id="q_note_report_template">
     <t t-call="web.basic_layout">
         <t t-foreach="docs" t-as="o">
             <t>
@@ -12,5 +19,193 @@
         </t>
     </t>
 </template>
+-->
+<template id="q_note_report_template">
+<t t-name="q_note_report">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2>Abweichungsmeldung # : <span t-field="o.name"/></h2>
+                            
+                            <h4><strong>betreffend</strong></h4>
+                        </div>
+                    </div>
+                    <div class="row mt32 mb32" t-if="o.op_type == 'product'">
+                        <div class="col-xs-3">
+                            <strong>[SN] Produkt:</strong><br/>
+                            <span t-field="o.move_line"/>
+                        </div>
+                        <div class="col-xs-3">
+                            <strong>Lieferant</strong><br/>
+                            <span t-field="o.lieferant"/>
+                        </div>
+                        <div class="col-xs-3">
+                            <strong>Bestellung</strong><br/>
+                            <span t-field="o.bestellung"/>
+                        </div>
+                        <div class="col-xs-3">
+                            <strong>Lieferschein Nummer</strong><br/>
+                            <span t-field="o.ls_nummer"/>
+                        </div>
+                    </div>
+                    <div class="row mt32 mb32" t-if="o.op_type == 'process'">
+                        <div class="col-xs-3">
+                            <strong>Prozess:</strong><br/>
+                            <span t-field="o.process"/>
+                        </div>
+                    </div>
 
+                    <div class="row mt32 mb32">
+                        <div class="col-xs-3">
+                            <strong>Printing date:</strong><br/>
+                            <span t-esc="time.strftime('%Y-%m-%d')" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                        </div>
+                        <div class="col-xs-3">
+                            <strong>Status:</strong><br/>
+                            <span t-field="o.state"/>
+                        </div>
+                    </div>
+                    <h2>Analysen</h2>
+                    <table class="table table-condensed">
+                      <thead>
+                        <tr>
+                          <th>Problembeschreibung</th>
+                          <th>Problemanalyse</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><span t-raw="o.description"/></td>
+                          <td><span t-raw="o.analysis"/></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <h2>Risikobewertung</h2>
+                    <table class="table table-condensed">
+                      <tbody>
+                        <tr>
+                            <td>Auswirkungen des Vorfalles</td>
+                            <td><span t-raw="o.auswirkung"/></td>
+                        </tr>
+                        <tr>
+                            <td>Auftretenswahrscheinlichkeit</td>
+                            <td><span t-raw="o.probability"/></td>
+                        </tr>
+                        <tr>
+                            <td>Entdeckungswahrscheinlichkeit</td>
+                            <td><span t-raw="o.discovery"/></td>
+                        </tr>
+                        <tr>
+                            <td>Risikoprioritätszahl</td>
+                            <td><span t-raw="o.risikozahl"/></td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <h2>Massnahmen</h2>
+                    <t t-if="not o.activity_ids">Keine Massnahmen getroffen.</t>
+                    <table class="table table-bordered" t-if="o.activity_ids">
+                        <thead>
+                            <tr>
+                                <th><strong>Massnahme</strong></th>
+                                <th><strong>Beschreibung</strong></th>
+                                <th><strong>Deadline</strong></th>
+                                <th><strong>Verantwortlich</strong></th>
+                                <th><strong>Status</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.activity_ids" t-as="activity">
+                                <td><span t-field="activity.summary"/></td>
+                                <td><span t-field="activity.note"/></td>
+                                <td><span t-field="activity.date_deadline"/></td>
+                                <td><span t-field="activity.user_id"/></td>
+                                <td><span t-field="activity.state"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!--
+                    <div t-if="o.workorder_ids">
+                        <strong>Problembeschreibung</strong>
+                        <table class="table table-condensed">
+                            <tr>
+                                <td class="text-center"><strong>Name</strong></td>
+                                <td class="text-center"><strong>WorkCenter</strong></td>
+                                <td class="text-center"><strong>No. Of Minutes</strong></td>
+                            </tr>
+                            <tr t-foreach="o.workorder_ids" t-as="line2">
+                                <td class="text-center"><span t-field="line2.name"/></td>
+                                <td class="text-center"><span t-field="line2.workcenter_id.name"/></td>
+                                <td class="text-center"><span t-field="line2.duration_expected"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <h3 t-if="o.finished_move_line_ids">Finished Products</h3>
+                    <table class="table table-condensed" t-if="o.finished_move_line_ids">
+                        <thead>
+                            <tr>
+                                <th><strong>Product</strong></th>
+                                <th><strong>Lot ID</strong></th>
+                                <th class="text-right"><strong>Quantity</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="o.finished_move_line_ids">
+                                <tr t-foreach="o.finished_move_line_ids" t-as="line">
+                                    <td>
+                                        <span t-field="line.product_id"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.lot_id"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="line.product_uom_qty"/>
+                                        <span t-field="line.product_uom_id" groups="product.group_uom"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <h3 t-if="o.move_raw_ids">Bill Of Material</h3>
+
+                    <table class="table table-condensed" t-if="o.move_raw_ids">
+                        <thead>
+                            <tr>
+                                <th><strong>Product</strong></th>
+                                <th><strong>Lot ID</strong></th>
+                                <th class="text-right"><strong>Quantity</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="o.move_raw_ids">
+                                <tr t-foreach="o.move_raw_ids" t-as="line">
+                                    <td>
+                                        <span t-field="line.product_id"/>
+                                    </td>
+                                    <td>
+                                      ID
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="line.product_uom_qty"/>
+                                        <span t-field="line.product_uom.name" groups="product.group_uom"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    -->
+
+                    <div class="oe_structure"/>
+                </div>
+            </t>
+        </t>
+    </t>
+</t>
+</template>
 </odoo>
+

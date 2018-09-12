@@ -5,8 +5,8 @@
             string="Report Abweichungsmeldung" 
             id="action_report_q_note" 
             model="q_note" 
-            name="q_note.q_note_template"
-            file="q_note.report.q_note_report_template" 
+            name="q_note.q_note_report"
+            file="q_note.report.q_note_report" 
             report_type="qweb-pdf"
             print_report_name="'Abweichungsmeldung - %s' % (object.name or '')"
         />
