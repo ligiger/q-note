@@ -74,6 +74,8 @@ class q_note(models.Model):
     date_cancelled = fields.Datetime(string='Abgebrochen am:', readonly="true")
     cancelled_by = fields.Many2one('res.users', string="Abgebrochen durch", readonly="true")
 
+    tasks = fields.One2many('project.task','abweichung_id')
+
     state = fields.Selection([
         ('draft', 'Entwurf'),
         ('created', 'Eingereicht'),
@@ -146,3 +148,7 @@ class Picking(models.Model):
 
     abweichungen = fields.One2many('q_note', 'product_we_id', string="Abweichungsmeldungen")
 
+class Task(models.Model):
+    _inherit = 'project.task'
+
+    abweichung_id = fields.Many2one('q_note', string="Zu Abweichungsmeldung")

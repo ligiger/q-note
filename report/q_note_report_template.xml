@@ -107,8 +107,8 @@
                     </table>
 
                     <h2>Massnahmen</h2>
-                    <t t-if="not o.activity_ids">Keine Massnahmen getroffen.</t>
-                    <table class="table table-bordered" t-if="o.activity_ids">
+                    <t t-if="not o.tasks">Keine Massnahmen getroffen.</t>
+                    <table class="table table-bordered" t-if="o.tasks">
                         <thead>
                             <tr>
                                 <th><strong>Massnahme</strong></th>
@@ -119,12 +119,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.activity_ids" t-as="activity">
-                                <td><span t-field="activity.summary"/></td>
-                                <td><span t-field="activity.note"/></td>
+                            <tr t-foreach="o.tasks" t-as="activity">
+                                <td><span t-field="activity.name"/></td>
+                                <td><span t-field="activity.description"/></td>
                                 <td><span t-field="activity.date_deadline"/></td>
                                 <td><span t-field="activity.user_id"/></td>
-                                <td><span t-field="activity.state"/></td>
+                                <td><span t-field="activity.stage_id"/></td>
                             </tr>
                         </tbody>
                     </table>

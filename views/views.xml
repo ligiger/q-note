@@ -73,7 +73,7 @@
                 </page>
                 <page string="Massnahmen">
                   <div>
-                    Massnahmen sind unten aufgeführt!!
+                    <field name="tasks" context="{'default_project_id': 2}"/>
                     <field name="activity_ids" widget="mail_activity"/>
                   </div>  
                 </page>
@@ -127,34 +127,22 @@
       </field>
   </record>
 
-  <!-- Inherit Activity Tree-->
-  <!-->
-    <record model="ir.ui.view" id="mail_activity_qnote_inherited_tree">
-      <field name="name">Tree View</field>
-      <field name="model">mail.activity</field>
-      <field name="inherit_id" ref="mail.mail_activity_view_tree"/>
+<!-- Project Task -->
+  <record model="ir.ui.view" id="project_task_form_inherited">
+      <field name="name">Project Task</field>
+      <field name="model">project.task</field>
+      <field name="inherit_id" ref="project.view_task_form2"/>
       <field name="priority" eval="15"/>
       <field name="arch" type="xml">
-        <xpath expr="//tree[1]" position="attributes">
-          <attribute name="create">true</attribute>
+        <xpath expr="//field[@name='stage_id']" position="replace">
+        </xpath>
+        <xpath expr="/form/sheet/div[2]" position="after">
+          <group>
+            <field name="stage_id"/>
+          </group>
         </xpath>
       </field>
   </record>
-
-  <record model="ir.ui.view" id="mail_activity_qnote_inherited_popup">
-      <field name="name">Form View</field>
-      <field name="model">mail.activity</field>
-      <field name="inherit_id" ref="mail.mail_activity_view_form_popup"/>
-      <field name="priority" eval="15"/>
-      <field name="arch" type="xml">
-        <xpath expr="//field[@name = 'note']" position="after">
-            <field name="res_model"/>
-            <field name="res_model_id"/>
-            <field name="res_id"/>
-        </xpath>
-      </field>
-  </record>   
--->
 
     <!-- Top menu item -->
     
