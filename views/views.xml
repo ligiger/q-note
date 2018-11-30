@@ -45,13 +45,18 @@
               <group>
                 <field name="op_type" attrs="{'readonly':[('state','!=','draft')]}"/>
               </group>
+              <group>
+                <field name="lieferant" attrs="{'readonly':[('state','!=','draft')]}"/>
+              </group>
+              <group attrs="{'invisible':[('op_type','!=', 'else')]}">
+                <field name="product" attrs="{'readonly':[('state','!=','draft')]}"/>
+              </group>
               <group attrs="{'invisible':[('op_type','!=', 'product')]}">
                 <field name="product_we_id" attrs="{'readonly':[('state','!=','draft')]}"/>
                 <field name="move_line" domain="[('picking_id','=', product_we_id)]" attrs="{'readonly':[('state','!=','draft')]}"/>
-                <field name="lieferant" attrs="{'readonly':[('state','!=','draft')]}"/>
-                <field name="bestellung" attrs="{'readonly':[('state','!=','draft')]}"/>
-                <field name="ls_nummer" attrs="{'readonly':[('state','!=','draft')]}"/>
-                <field name="migo_nummer" attrs="{'readonly':[('state','!=','draft')]}"/>
+                <field name="bestellung"/>
+                <field name="ls_nummer"/>
+                <field name="migo_nummer"/>
               </group>
               <group attrs="{'invisible':[('op_type','!=', 'process')]}">
                 <field name="process" attrs="{'readonly':[('state','!=','draft')]}"/>

@@ -44,11 +44,13 @@ class q_note(models.Model):
     op_type = fields.Selection([
         ('product', 'Lagerprodukt'),
         ('process', 'Prozess'),
+        ('else', 'Sonstiges'),
     ], default="product", string="Meldungstyp")
     
     product_we_id = fields.Many2one('stock.picking', string="Wareneingang Vorgang")
     move_line = fields.Many2one('stock.move.line', string="Betroffenes Produkt")
-    lieferant = fields.Many2one(related='product_we_id.partner_id', string="Lieferant", readonly="true")
+    product = fields.Many2one('product.product', string="Produkt")
+    lieferant = fields.Many2one('res.partner', string="Lieferant", readonly="true")
     bestellung = fields.Char(related='product_we_id.origin', string="Bestellnummer", readonly="true")
     ls_nummer = fields.Char(related='product_we_id.x_ls_nummer', string="Lieferscheinnummer", readonly="true")
     migo_nummer = fields.Char(related='product_we_id.x_migo_nr', string="Migo-Nummer", readonly="true")
