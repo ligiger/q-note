@@ -63,10 +63,14 @@
               </group>
               <notebook>
                 <page string="Problembeschreibung">
+                  <group>
                     <field name="description" widget="html" attrs="{'readonly':[('state','!=','draft')]}"/>
+                  </group>
                 </page>
                 <page string="Problemanalyse">
+                  <group>
                     <field name="analysis" widget="html" attrs="{'readonly':[('state','!=','created')]}"/>
+                  </group>
                 </page>
                 <page string="Risikoanalyse">
                   <group string= "Risikobewertung nach Q.Wiki 'Bewertungsschema Risiken'">
